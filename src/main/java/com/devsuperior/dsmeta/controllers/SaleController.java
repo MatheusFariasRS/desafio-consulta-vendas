@@ -1,13 +1,11 @@
 package com.devsuperior.dsmeta.controllers;
 
 import com.devsuperior.dsmeta.dto.SaleReportDTO;
+import com.devsuperior.dsmeta.projection.SaleSummaryProjection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-<<<<<<< Updated upstream
-=======
 import org.springframework.data.domain.Pageable;
->>>>>>> Stashed changes
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,41 +20,33 @@ public class SaleController {
 
 	@Autowired
 	private SaleService service;
-	
+
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<SaleMinDTO> findById(@PathVariable Long id) {
 		SaleMinDTO dto = service.findById(id);
 		return ResponseEntity.ok(dto);
 	}
 
-<<<<<<< Updated upstream
-	@GetMapping(value = "/report")
-	public ResponseEntity<Page<SaleMinDTO>> getReport(
-			@RequestParam(value = "page", defaultValue = "0") Integer page,
-			@RequestParam(value = "size", defaultValue = "10") Integer size)
-	{
-
-		PageRequest pageRequest = PageRequest.of(page, size);
-		Page<SaleMinDTO> list = service.find(pageRequest);
-		return ResponseEntity.ok(list);
-=======
 	@GetMapping("/report")
 	public ResponseEntity<Page<SaleReportDTO>> getReport(
 			@RequestParam(value = "minDate", defaultValue = "") String minDate,
 			@RequestParam(value = "maxDate", defaultValue = "") String maxDate,
 			@RequestParam(value = "name", defaultValue = "") String name,
 			@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestParam(value = "size", defaultValue = "10") int size)
+			@RequestParam(value = "size", defaultValue = "12") int size)
 	{
 		PageRequest pageRequest = PageRequest.of(page, size);
-		Page<SaleReportDTO> report = (Page<SaleReportDTO>) service.report(minDate, maxDate, name, pageRequest);
+		Page<SaleReportDTO> report =  service.report(minDate, maxDate, name, pageRequest);
 		return ResponseEntity.ok(report);
->>>>>>> Stashed changes
 	}
 
 	@GetMapping(value = "/summary")
-	public ResponseEntity<?> getSummary() {
-		// TODO
-		return null;
+	public ResponseEntity<List<SaleSummaryProjection>> getSummary(
+			@RequestParam(value = "minDate", defaultValue = "") String minDate,
+			@RequestParam(value = "maxDate", defaultValue = "") String maxDate) {
+
+		List<SaleSummaryProjection> list = service.summary(minDate, maxDate);
+
+		return ResponseEntity.ok(list);
 	}
 }

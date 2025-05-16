@@ -7,17 +7,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-<<<<<<< Updated upstream
-import com.devsuperior.dsmeta.projection.SaleMinProjection;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-=======
 import com.devsuperior.dsmeta.dto.SaleReportDTO;
+import com.devsuperior.dsmeta.projection.SaleSummaryProjection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
->>>>>>> Stashed changes
 import org.springframework.stereotype.Service;
 
 import com.devsuperior.dsmeta.dto.SaleMinDTO;
@@ -29,27 +23,52 @@ public class SaleService {
 
 	@Autowired
 	private SaleRepository repository;
-	
+
 	public SaleMinDTO findById(Long id) {
 		Optional<Sale> result = repository.findById(id);
 		Sale entity = result.get();
 		return new SaleMinDTO(entity);
 	}
-<<<<<<< Updated upstream
-
-	public Page<SaleMinDTO> find(PageRequest pageRequest) {
-		Page<SaleMinProjection> page = repository.salesReport(pageRequest);
-		return page.map(SaleMinDTO::new);  // Correção: não é necessário cast para Page<SaleMinDTO>
+	public Page<SaleReportDTO> report(String minDateStr, String maxDateStr, String name, Pageable pageable) {
+		LocalDate maxDate;
+		if (maxDateStr == null || maxDateStr.isEmpty()) {
+			maxDate = LocalDate.now();
+		} else {
+			maxDate = LocalDate.parse(maxDateStr);
+		}
+		LocalDate minDate;
+		if (minDateStr == null || minDateStr.isEmpty()) {
+			minDate = maxDate.minusYears(1L);
+		} else {
+			minDate = LocalDate.parse(minDateStr);
+		}
+		String nomeTratado;
+		if (name == null || name.trim().isEmpty()) {
+			nomeTratado = "";
+		} else {
+			nomeTratado = name.trim();
+		}
+		Page<Sale> list = repository.salesReport(minDate, maxDate, nomeTratado, pageable);
+		return list.map(SaleReportDTO::new);
 	}
 
-=======
-	public Page<SaleReportDTO> report(String minDateStr, String maxDateStr, String name, Pageable pageable){
+	public List<SaleSummaryProjection> summary(String minDateStr, String maxDateStr){
 
-		LocalDate minDate = minDateStr.isEmpty() ? LocalDate.of(1900, 1, 1) : LocalDate.parse(minDateStr);
-		LocalDate maxDate = maxDateStr.isEmpty() ? LocalDate.now() : LocalDate.parse(maxDateStr);
+		LocalDate maxDate;
+		if (maxDateStr == null || maxDateStr.isEmpty()) {
+			maxDate = LocalDate.now();
+		} else {
+			maxDate = LocalDate.parse(maxDateStr);
+		}
+		LocalDate minDate;
+		if (minDateStr == null || minDateStr.isEmpty()) {
+			minDate = maxDate.minusYears(1L);
+		} else {
+			minDate = LocalDate.parse(minDateStr);
+		}
 
-		Page<Sale> list = repository.salesReport(minDate, maxDate, name, pageable);
-		return list.map(x -> new SaleReportDTO(x));
+		return repository.salesSummary(minDate, maxDate);
 	}
->>>>>>> Stashed changes
+
+
 }
