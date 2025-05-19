@@ -1,20 +1,16 @@
 package com.devsuperior.dsmeta.services;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import com.devsuperior.dsmeta.dto.SaleReportDTO;
+import com.devsuperior.dsmeta.dto.SaleMinDTO;
 import com.devsuperior.dsmeta.projection.SaleSummaryProjection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.devsuperior.dsmeta.dto.SaleMinDTO;
 import com.devsuperior.dsmeta.entities.Sale;
 import com.devsuperior.dsmeta.repositories.SaleRepository;
 
@@ -29,7 +25,9 @@ public class SaleService {
 		Sale entity = result.get();
 		return new SaleMinDTO(entity);
 	}
-	public Page<SaleReportDTO> report(String minDateStr, String maxDateStr, String name, Pageable pageable) {
+
+
+	public Page<SaleMinDTO> report(String minDateStr, String maxDateStr, String name, Pageable pageable) {
 		LocalDate maxDate;
 		if (maxDateStr == null || maxDateStr.isEmpty()) {
 			maxDate = LocalDate.now();
@@ -48,9 +46,11 @@ public class SaleService {
 		} else {
 			nomeTratado = name.trim();
 		}
+
 		Page<Sale> list = repository.salesReport(minDate, maxDate, nomeTratado, pageable);
-		return list.map(SaleReportDTO::new);
+		return list.map(SaleMinDTO::new);
 	}
+
 
 	public List<SaleSummaryProjection> summary(String minDateStr, String maxDateStr){
 
